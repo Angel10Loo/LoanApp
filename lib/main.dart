@@ -3,10 +3,11 @@ import 'package:loan_app/src/presentation/screens/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
-void main() {
-  // Set the log level to a higher level to see fewer log messages.
-  // Levels in increasing order of verbosity: OFF, FINEST, FINER, FINE, CONFIG, INFO, WARNING, SEVERE, SHOUT.
-  // Adjust the log level as needed.
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   debugPrint = (String? message, {int? wrapWidth}) {};
   runApp(const MyApp());
 }
