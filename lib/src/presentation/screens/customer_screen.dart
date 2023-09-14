@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:loan_app/src/domain/entities/customer.dart';
+import 'package:loan_app/src/domain/services/firebase_service.dart';
 import 'package:loan_app/src/utils/constans.dart';
-import 'package:loan_app/src/utils/helper.dart';
+import 'package:loan_app/src/utils/responsive.dart';
 
 // ignore: use_key_in_widget_constructors
 class AddCustomerScreen extends StatefulWidget {
@@ -11,12 +12,36 @@ class AddCustomerScreen extends StatefulWidget {
 
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _searchController = TextEditingController();
+  final FirebaseService _firebaseService = FirebaseService();
 
-  final Customer _customer =
-      Customer(id: 0, firstName: '', lastName: '', cedula: '', phoneNumber: '');
+  List<Customer> customers = [];
+  List<Customer> customersFound = [];
+
+  List items = [];
+
+  searchEngine(String enteredKey) {
+    List<Customer> customersResult = [];
+    if (enteredKey.isEmpty) {
+      customersResult = customers;
+    } else {
+      customersResult = customers
+          .where((customer) => customer.firstName
+              .toLowerCase()
+              .contains(enteredKey.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      customersFound = customersResult;
+    });
+  }
+
+  final Customer _customer = Customer(
+      id: '', firstName: '', lastName: '', cedula: '', phoneNumber: '');
 
   @override
   Widget build(BuildContext context) {
+    final rp = Responsive(context);
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -30,6 +55,48 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             ),
           ),
         ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Motor de búsqueda',
+                  hintText: 'Que cliente deseas buscar.... ?',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  // Handle search functionality here
+                  searchEngine(value);
+                },
+              ),
+            ),
+            SizedBox(height: rp.hp(5)),
+            FutureBuilder(
+              future: _firebaseService.getCustomerData(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  // Handle error state
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  if (snapshot.hasData) {
+                    customers = snapshot.data.docs
+                        .map((doc) => Customer.fromSnapshot(doc))
+                        .toList()
+                        .cast<Customer>();
+                    customersFound = customers;
+                    return _customersListView(customers);
+                  }
+                  return const Center(child: Text("No hay Data"));
+                }
+              },
+            ),
+          ],
+        ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           onPressed: () {
@@ -38,6 +105,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
           child: const Icon(Icons.add),
         ),
         bottomNavigationBar: BottomAppBar(
+          color: Colors.indigo,
           shape: const CircularNotchedRectangle(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -130,8 +198,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
-                    print(
-                        'Customer Data: ${_customer.firstName}, ${_customer.lastName}, ${_customer.phoneNumber}, ${_customer.cedula}');
+                    _firebaseService.saveCustomer(_customer);
                     ScaffoldMessenger.of(context).showSnackBar(
                       _showSnackBar(context),
                     );
@@ -144,6 +211,76 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
             ],
           );
         });
+  }
+
+  Expanded _customersListView(List<Customer> data) {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: customersFound.length,
+        itemBuilder: (BuildContext context, int index) {
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 9),
+            child: ListTile(
+              leading: CircleAvatar(
+                child: Text(customersFound[index].firstName.substring(0, 1) +
+                    '' +
+                    customersFound[index].lastName.substring(0, 1)),
+              ),
+              title: Text(customersFound[index].firstName +
+                  ' ' +
+                  customersFound[index].lastName),
+              subtitle: Text(
+                  'Teléfono: ${customersFound[index].phoneNumber} \n Cédula: ${customersFound[index].cedula}'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.amber),
+                    onPressed: () {
+                      // Implement the edit functionality here
+                      // You can open a dialog or navigate to an edit screen
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Editar'),
+                            content: TextField(
+                              controller:
+                                  TextEditingController(text: items[index]),
+                              onChanged: (value) {
+                                items[index] = value;
+                              },
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                child: const Text('Guardar'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  setState(() {}); // Update the UI
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red.shade900),
+                    onPressed: () {
+                      // Implement the delete functionality here
+                      setState(() {
+                        customers.removeAt(index);
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   SnackBar _showSnackBar(BuildContext context) {

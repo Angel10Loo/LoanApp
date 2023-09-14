@@ -27,8 +27,8 @@ class MainScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10.0)),
-                      child: Column(
-                        children: const <Widget>[
+                      child: const Column(
+                        children: <Widget>[
                           Text('Prestamos',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 17)),
@@ -41,8 +41,8 @@ class MainScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10.0)),
-                      child: Column(
-                        children: const <Widget>[
+                      child: const Column(
+                        children: <Widget>[
                           Text('Inventario',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 17)),
@@ -55,8 +55,8 @@ class MainScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(10.0)),
-                      child: Column(
-                        children: const <Widget>[
+                      child: const Column(
+                        children: <Widget>[
                           Text('Clientes',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 17)),
