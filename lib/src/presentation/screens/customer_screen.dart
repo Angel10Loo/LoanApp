@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loan_app/src/domain/entities/customer.dart';
 import 'package:loan_app/src/domain/services/firebase_service.dart';
+import 'package:loan_app/src/presentation/Widgets/appbar_widget.dart';
 import 'package:loan_app/src/utils/constans.dart';
 import 'package:loan_app/src/utils/responsive.dart';
 
@@ -44,17 +45,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     final rp = Responsive(context);
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text("Listado Clientes"),
-          elevation: 8.0,
-          backgroundColor: mainColor,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20.0),
-            ),
-          ),
-        ),
+        appBar: const AppBarCustomWidget(title: "Listado de Clientes"),
         body: Column(
           children: [
             Padding(
@@ -172,6 +163,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                     },
                   ),
                   TextFormField(
+                    keyboardType: TextInputType.phone,
                     decoration:
                         const InputDecoration(labelText: 'Numero de Celular'),
                     onSaved: (value) {

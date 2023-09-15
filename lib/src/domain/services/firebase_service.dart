@@ -1,6 +1,7 @@
 // import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loan_app/src/domain/entities/customer.dart';
+import 'package:loan_app/src/domain/entities/inventory.dart';
 
 class FirebaseService {
   // final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,7 +26,38 @@ class FirebaseService {
   //   await _auth.signOut();
   // }
 
-  // Firestore methods
+  // FireStore Inventories
+  Future<void> deleteInventory() async {
+    try {
+      CollectionReference _inventories = _firestore.collection("Inventories");
+      _inventories.doc("EIPNUqaWuySNM2VfUKQe").delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<QuerySnapshot<Map<String, dynamic>>?> getInventoriesData() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+          await _firestore.collection('Inventories').get();
+      return snapshot;
+    } catch (e) {
+      print('Error fetching user data: $e');
+      return null;
+    }
+  }
+
+  Future<void> saveInventory(Inventory inventory) async {
+    try {
+      CollectionReference _inventories = _firestore.collection("Inventories");
+      await _inventories
+          .add({'product': inventory.product, 'quantity': inventory.quantity});
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Firestore Customers
   Future<QuerySnapshot<Map<String, dynamic>>?> getCustomerData() async {
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot =
