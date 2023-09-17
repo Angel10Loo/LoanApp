@@ -27,10 +27,10 @@ class FirebaseService {
   // }
 
   // FireStore Inventories
-  Future<void> deleteInventory() async {
+  Future<void> deleteInventory(String inventoryId) async {
     try {
       CollectionReference _inventories = _firestore.collection("Inventories");
-      _inventories.doc("EIPNUqaWuySNM2VfUKQe").delete();
+      _inventories.doc(inventoryId).delete();
     } catch (e) {
       print(e);
     }
@@ -50,8 +50,12 @@ class FirebaseService {
   Future<void> saveInventory(Inventory inventory) async {
     try {
       CollectionReference _inventories = _firestore.collection("Inventories");
-      await _inventories
-          .add({'product': inventory.product, 'quantity': inventory.quantity});
+      await _inventories.add({
+        'product': inventory.product,
+        'quantity': inventory.quantity,
+        'price': inventory.price,
+        'salePrice': inventory.salePrice
+      });
     } catch (e) {
       print(e);
     }

@@ -16,8 +16,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseService _firebaseService = FirebaseService();
 
-  final Inventory _inventory =
-      Inventory(inventoryId: "", product: "", quantity: 0);
+  final Inventory _inventory = Inventory(
+      inventoryId: "", product: "", quantity: 0, salePrice: 0.00, price: 0.00);
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +37,21 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   // Handle error state
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  if (snapshot.hasData) {
+                  if (snapshot.data.docs.length > 0) {
                     _inventories = snapshot.data.docs
                         .map((doc) => Inventory.fromSnapshot(doc))
                         .toList()
                         .cast<Inventory>();
                     return _listViewInventories();
                   } else {
-                    return const Center(child: Text("No hay Data"));
+                    return Container(
+                      margin: EdgeInsets.only(top: rp.dp(20)),
+                      child: const Center(
+                          child: Text(
+                        "No tenemos registro en el inventario 😔",
+                        style: TextStyle(fontSize: 17),
+                      )),
+                    );
                   }
                 }
               },
@@ -74,8 +81,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
               onTap: () {},
               title: Text(_inventories[index].product),
               subtitle: Text(
-                'Quantity: ${_inventories[index].quantity}',
-                style: TextStyle(fontWeight: FontWeight.w900),
+                'Cantidad: ${_inventories[index].quantity} \n Capital: ${_inventories[index].price}',
+                style: const TextStyle(fontWeight: FontWeight.w900),
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -89,8 +96,14 @@ class _InventoryScreenState extends State<InventoryScreen> {
                         color: Colors.blue.shade700,
                       )),
                   IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.amber),
+                      onPressed: () {}
+                      // Implement the
+                      ),
+                  IconButton(
                       onPressed: () {
-                        _firebaseService.deleteInventory();
+                        _firebaseService
+                            .deleteInventory(_inventories[index].inventoryId);
                         setState(() {});
                       },
                       icon: Icon(
@@ -140,6 +153,33 @@ class _InventoryScreenState extends State<InventoryScreen> {
                     },
                     onSaved: (value) {
                       _inventory.quantity = int.parse(value!);
+                    },
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(labelText: 'Precio'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingrese el Precio';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _inventory.price = double.parse(value!);
+                    },
+                  ),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    decoration:
+                        const InputDecoration(labelText: 'Precio de venta'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor ingrese el precio  que desea venderla';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _inventory.salePrice = double.parse(value!);
                     },
                   ),
                 ],

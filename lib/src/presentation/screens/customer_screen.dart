@@ -38,7 +38,7 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   }
 
   final Customer _customer = Customer(
-      id: '', firstName: '', lastName: '', cedula: '', phoneNumber: '');
+      customerId: '', firstName: '', lastName: '', cedula: '', phoneNumber: '');
 
   @override
   Widget build(BuildContext context) {
