@@ -31,6 +31,10 @@ dependencies:
   google_fonts: ^2.3.0
   firebase_core: ^2.15.1
   cloud_firestore: ^4.9.1
+  intl: ^0.18.1
+  dropdown_search: ^5.0.6
+  card_actions: ^0.0.1
+  syncfusion_flutter_charts: ^23.1.38
 
 
 dev_dependencies:

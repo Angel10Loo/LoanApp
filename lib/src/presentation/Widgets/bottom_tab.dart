@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loan_app/src/presentation/screens/customer_screen.dart';
 import 'package:loan_app/src/presentation/screens/inventory_screen.dart';
+import 'package:loan_app/src/presentation/screens/loan_screen.dart';
 import 'package:loan_app/src/utils/constans.dart';
 
 class BottomTabs extends StatefulWidget {
@@ -51,7 +52,7 @@ class _BottomTabsState extends State<BottomTabs> {
       _currentIndex = index;
       if (index == 1) {
         Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => AddCustomerScreen(),
+          builder: (context) => LoanScreen(),
         ));
       } else if (index == 2) {
         Navigator.of(context).push(MaterialPageRoute(

@@ -11,30 +11,28 @@ class AddCustomerScreen extends StatefulWidget {
   _AddCustomerScreenState createState() => _AddCustomerScreenState();
 }
 
+List<Customer> customersFound = [];
+
 class _AddCustomerScreenState extends State<AddCustomerScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
 
   List<Customer> customers = [];
-  List<Customer> customersFound = [];
 
   List items = [];
 
   searchEngine(String enteredKey) {
     List<Customer> customersResult = [];
-    if (enteredKey.isEmpty) {
-      customersResult = customers;
-    } else {
+    if (enteredKey.isNotEmpty) {
       customersResult = customers
           .where((customer) => customer.firstName
               .toLowerCase()
               .contains(enteredKey.toLowerCase()))
           .toList();
-    }
-    setState(() {
       customersFound = customersResult;
-    });
+    }
+    setState(() {});
   }
 
   final Customer _customer = Customer(
@@ -45,7 +43,9 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
     final rp = Responsive(context);
     return SafeArea(
       child: Scaffold(
-        appBar: const AppBarCustomWidget(title: "Listado de Clientes"),
+        backgroundColor: bodyColor,
+        appBar: const AppBarCustomWidget(
+            title: "Listado de Clientes", isCentered: false),
         body: Column(
           children: [
             Padding(
@@ -79,8 +79,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                         .map((doc) => Customer.fromSnapshot(doc))
                         .toList()
                         .cast<Customer>();
-                    customersFound = customers;
-                    return _customersListView(customers);
+
+                    if (customersFound.isEmpty) {
+                      customersFound = customers;
+                    }
+                    return _customersListView(customersFound);
                   }
                   return const Center(child: Text("No hay Data"));
                 }
@@ -90,13 +93,14 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
+          backgroundColor: mainColor,
           onPressed: () {
             _addCustomerDialog(context);
           },
           child: const Icon(Icons.add),
         ),
         bottomNavigationBar: BottomAppBar(
-          color: Colors.indigo,
+          color: bootomNavColor,
           shape: const CircularNotchedRectangle(),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -211,7 +215,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
         itemCount: customersFound.length,
         itemBuilder: (BuildContext context, int index) {
           return Card(
+            color: cardColor,
             margin: const EdgeInsets.symmetric(vertical: 9),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
             child: ListTile(
               leading: CircleAvatar(
                 child: Text(customersFound[index].firstName.substring(0, 1) +
@@ -259,11 +267,11 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                   ),
                   IconButton(
                     icon: Icon(Icons.delete, color: Colors.red.shade900),
-                    onPressed: () {
+                    onPressed: () async {
                       // Implement the delete functionality here
-                      setState(() {
-                        customers.removeAt(index);
-                      });
+                      _firebaseService
+                          .deleteCustomer(customersFound[index].customerId!);
+                      setState(() {});
                     },
                   ),
                 ],

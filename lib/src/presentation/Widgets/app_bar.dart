@@ -15,12 +15,12 @@ class AppBarWidget extends StatelessWidget {
           borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(11.2),
               bottomRight: Radius.circular(11.2))),
-      child: Stack(children: [
+      child: const Stack(children: [
         Column(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const <Widget>[
+              children: <Widget>[
                 Icon(Icons.menu, color: Colors.white, size: 32),
                 Text("Inicio",
                     style: TextStyle(

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:loan_app/src/domain/entities/inventory.dart';
 import 'package:loan_app/src/domain/services/firebase_service.dart';
 import 'package:loan_app/src/presentation/Widgets/appbar_widget.dart';
+import 'package:loan_app/src/presentation/screens/inventory_sale_screen.dart';
 import 'package:loan_app/src/utils/constans.dart';
+import 'package:loan_app/src/utils/helper.dart';
 import 'package:loan_app/src/utils/responsive.dart';
 
 // ignore: use_key_in_widget_constructors
@@ -24,7 +26,11 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final rp = Responsive(context);
     return SafeArea(
       child: Scaffold(
-        appBar: const AppBarCustomWidget(title: "Inventario"),
+        backgroundColor: bodyColor,
+        appBar: const AppBarCustomWidget(
+          title: "Inventario",
+          isCentered: true,
+        ),
         body: Column(
           children: <Widget>[
             SizedBox(height: rp.hp(10)),
@@ -60,6 +66,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
+          backgroundColor: mainColor,
           onPressed: () {
             _addToInventoryDialog(context);
           },
@@ -76,20 +83,84 @@ class _InventoryScreenState extends State<InventoryScreen> {
         itemCount: _inventories.length,
         itemBuilder: (context, index) {
           return Card(
+            color: cardColor,
             elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
             child: ListTile(
               onTap: () {},
-              title: Text(_inventories[index].product),
-              subtitle: Text(
-                'Cantidad: ${_inventories[index].quantity} \n Capital: ${_inventories[index].price}',
-                style: const TextStyle(fontWeight: FontWeight.w900),
+              title: Text(
+                _inventories[index].product,
+                style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
               ),
+              subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    RichText(
+                        text: TextSpan(children: [
+                      const TextSpan(
+                          text: 'Cantidad : ',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF9E9E9E),
+                              fontWeight: FontWeight.bold)),
+                      TextSpan(
+                          text: '${_inventories[index].quantity}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          )),
+                    ])),
+                    RichText(
+                        text: TextSpan(children: [
+                      const TextSpan(
+                          text: 'Capital : ',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF9E9E9E),
+                              fontWeight: FontWeight.bold)),
+                      TextSpan(
+                          text: Helper.formatNumberWithCommas(
+                              _inventories[index].price.toString()),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          )),
+                    ])),
+                    RichText(
+                        text: TextSpan(children: [
+                      const TextSpan(
+                          text: 'Precio Venta : ',
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF9E9E9E),
+                              fontWeight: FontWeight.bold)),
+                      TextSpan(
+                          text: Helper.formatNumberWithCommas(
+                              _inventories[index].salePrice.toString()),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          )),
+                    ])),
+                  ]),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   IconButton(
                       onPressed: () {
-                        setState(() {});
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: ((context) => const InventorySale()),
+                            settings: RouteSettings(arguments: {
+                              "id": _inventories[index].inventoryId,
+                              "productName": _inventories[index].product,
+                              "salePrice": _inventories[index].salePrice,
+                              "quantityAvaible": _inventories[index].quantity
+                            })));
                       },
                       icon: Icon(
                         Icons.remove_red_eye,
@@ -216,7 +287,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
 
   BottomAppBar _bottomTab(BuildContext context) {
     return BottomAppBar(
-      color: Colors.indigo,
+      color: bootomNavColor,
       shape: const CircularNotchedRectangle(),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
