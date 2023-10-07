@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loan_app/src/domain/entities/income.dart';
+import 'package:loan_app/src/domain/services/firebase_service.dart';
 import 'package:loan_app/src/presentation/Widgets/app_bar.dart';
 import 'package:loan_app/src/presentation/Widgets/bottom_tab.dart';
 import 'package:loan_app/src/presentation/Widgets/chart_widget.dart';
 import 'package:loan_app/src/utils/constans.dart';
+import 'package:loan_app/src/utils/helper.dart';
 import 'package:loan_app/src/utils/responsive.dart';
 
 class MainScreen extends StatefulWidget {
@@ -12,7 +16,26 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
+int loanIncome = 0;
+
 class _MainScreenState extends State<MainScreen> {
+  final FirebaseService _firebaseService = FirebaseService();
+
+  Income _income =
+      Income(createdDate: Timestamp.fromDate(DateTime.now()), income: 0);
+  @override
+  void initState() {
+    super.initState();
+    fetchIncome();
+  }
+
+  Future<void> fetchIncome() async {
+    _income = await _firebaseService.getIncome();
+    setState(() {
+      loanIncome = _income.income.toInt();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var rp = Responsive(context);
@@ -36,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                "Ganancias",
+                                "Ganancias ${Helper.formatNumberWithCommas(loanIncome.toString())}",
                                 style: TextStyle(fontSize: rp.dp(2.8)),
                               ),
                             ),

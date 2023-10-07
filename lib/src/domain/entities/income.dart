@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Income {
   String? incomeId;
-  String createdDate;
+  Timestamp createdDate;
   double income;
 
   Income({

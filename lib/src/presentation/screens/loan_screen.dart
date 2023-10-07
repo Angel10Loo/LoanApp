@@ -8,6 +8,7 @@ import 'package:loan_app/src/domain/services/firebase_service.dart';
 import 'package:loan_app/src/presentation/Widgets/alertInfo.dart';
 import 'package:loan_app/src/presentation/Widgets/appbar_widget.dart';
 import 'package:loan_app/src/presentation/screens/customer_screen.dart';
+import 'package:loan_app/src/presentation/screens/main_screen.dart';
 import 'package:loan_app/src/presentation/screens/payment_screen.dart';
 import 'package:loan_app/src/utils/constans.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -42,6 +43,7 @@ class _LoanScreenState extends State<LoanScreen> {
   @override
   void initState() {
     super.initState();
+    loansFound = [];
     // Fetch customers from Firebase and update the dropdown items
     fetchCustomers();
   }
@@ -208,6 +210,7 @@ class _LoanScreenState extends State<LoanScreen> {
 
                         if (accept!) {
                           await _firebaseService.deleteLoan(loan.loanId!);
+                          loansFound = [];
                           setState(() {});
                         }
                       },
@@ -350,6 +353,13 @@ class _LoanScreenState extends State<LoanScreen> {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
 
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        });
+
                     String id = await _firebaseService.saveLoan(_loan);
 
                     _loan.loanId = id;
@@ -363,6 +373,8 @@ class _LoanScreenState extends State<LoanScreen> {
                     );
 
                     Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+
                     setState(() {});
                   }
                 },
@@ -399,7 +411,7 @@ class _LoanScreenState extends State<LoanScreen> {
           paymentDate);
 
       paymentDate = amortization.paymentDate!;
-
+      loansFound = [];
       await _firebaseService.saveAmortization(amortization);
     }
   }
@@ -466,7 +478,8 @@ class _LoanScreenState extends State<LoanScreen> {
             color: mainColor,
             onPressed: () {
               // Handle home tab press
-              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: ((context) => const MainScreen())));
             },
           ),
           IconButton(

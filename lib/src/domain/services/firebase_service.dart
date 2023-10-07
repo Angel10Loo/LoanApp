@@ -37,7 +37,7 @@ class FirebaseService {
 
   // FireStore Loans
 
-  Future<List<Income>> getIncome() async {
+  Future<List<Income>> getIncomes() async {
     try {
       QuerySnapshot<Map<String, dynamic>> snapshot =
           await _firestore.collection("Incomes").get();
@@ -58,14 +58,36 @@ class FirebaseService {
     }
   }
 
+  Future<Income> getIncome() async {
+    QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
+        .collection("Incomes")
+        .orderBy("createdDate", descending: true)
+        .limit(1)
+        .get();
+    final Income income;
+    if (snapshot.docs.isNotEmpty) {
+      DocumentSnapshot<Map<String, dynamic>> document = snapshot.docs.first;
+      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+      income = Income(
+        incomeId: document.id,
+        income: data["income"],
+        createdDate: data['createdDate'] ?? '',
+      );
+      return income;
+    } else {
+      print('No document found for the given date.');
+    }
+    return Income(createdDate: Timestamp.fromDate(DateTime.now()), income: 0);
+  }
+
   Future<void> updateIncome(double income) async {
     CollectionReference _incomes = _firestore.collection("Incomes");
-    List<Income> incomes = await getIncome();
+    List<Income> incomes = await getIncomes();
     String incomeID = "";
     double incomeFromDb = 0;
 
-    for (var income in incomes.where((element) => Helper.isDateInCurrentMonth(
-        DateFormat("dd-MM-yyyy").parse(element.createdDate)))) {
+    for (var income in incomes.where((element) =>
+        Helper.isDateInCurrentMonth(element.createdDate.toDate()))) {
       incomeID = income.incomeId!;
       incomeFromDb = income.income;
     }
@@ -73,7 +95,7 @@ class FirebaseService {
       try {
         await _incomes.add({
           "income": income,
-          "createdDate": DateFormat("dd-MM-yyyy").format(DateTime.now()),
+          "createdDate": Timestamp.fromDate(DateTime.now()),
         });
       } catch (e) {
         print(e);

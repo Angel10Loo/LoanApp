@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loan_app/src/domain/entities/customer.dart';
 import 'package:loan_app/src/domain/services/firebase_service.dart';
+import 'package:loan_app/src/presentation/Widgets/alertInfo.dart';
 import 'package:loan_app/src/presentation/Widgets/appbar_widget.dart';
 import 'package:loan_app/src/utils/constans.dart';
 import 'package:loan_app/src/utils/responsive.dart';
@@ -21,6 +22,12 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
   List<Customer> customers = [];
 
   List items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    customersFound = [];
+  }
 
   searchEngine(String enteredKey) {
     List<Customer> customersResult = [];
@@ -194,11 +201,22 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
+
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        });
+
                     _firebaseService.saveCustomer(_customer);
                     ScaffoldMessenger.of(context).showSnackBar(
                       _showSnackBar(context),
                     );
 
+                    customersFound = [];
+
+                    Navigator.of(context).pop();
                     Navigator.of(context).pop();
                   }
                 },
@@ -269,8 +287,20 @@ class _AddCustomerScreenState extends State<AddCustomerScreen> {
                     icon: Icon(Icons.delete, color: Colors.red.shade900),
                     onPressed: () async {
                       // Implement the delete functionality here
-                      _firebaseService
-                          .deleteCustomer(customersFound[index].customerId!);
+                      bool? accept = await ShowAlertInfo.showConfirmationDialog(
+                          context,
+                          "Estas seguro que deseas eliminar este cliente",
+                          "Advertencia",
+                          const Icon(
+                            Icons.warning,
+                            color: Colors.yellow,
+                          ));
+
+                      if (accept!) {
+                        _firebaseService
+                            .deleteCustomer(customersFound[index].customerId!);
+                      }
+                      customersFound = [];
                       setState(() {});
                     },
                   ),
