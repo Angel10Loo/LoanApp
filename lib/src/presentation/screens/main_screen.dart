@@ -59,15 +59,32 @@ class _MainScreenState extends State<MainScreen> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                "Ganancias ${Helper.formatNumberWithCommas(loanIncome.toString())}",
-                                style: TextStyle(fontSize: rp.dp(2.8)),
+                                "Ganancias ",
+                                style: TextStyle(
+                                    fontSize: rp.dp(2.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.green),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.monetization_on,
-                                  size: rp.dp(3.01)),
-                            )
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 5),
+                                  child: Icon(
+                                    Icons.monetization_on,
+                                    size: rp.dp(3.01),
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: Text(
+                                      Helper.formatNumberWithCommas(
+                                          loanIncome.toString()),
+                                      style: TextStyle(fontSize: rp.dp(2.8))),
+                                ),
+                              ],
+                            ),
                           ]),
                     )),
                 SizedBox(height: rp.hp(2)),
@@ -85,15 +102,32 @@ class _MainScreenState extends State<MainScreen> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
-                                "Ganancias",
-                                style: TextStyle(fontSize: rp.dp(2.8)),
+                                "Ganancias ",
+                                style: TextStyle(
+                                    fontSize: rp.dp(2.8),
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.green),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(Icons.monetization_on,
-                                  size: rp.dp(3.01)),
-                            )
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 5),
+                                  child: Icon(
+                                    Icons.monetization_on,
+                                    size: rp.dp(3.01),
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 6),
+                                  child: Text(
+                                      Helper.formatNumberWithCommas(
+                                          loanIncome.toString()),
+                                      style: TextStyle(fontSize: rp.dp(2.8))),
+                                ),
+                              ],
+                            ),
                           ]),
                     )),
                 const SizedBox(
@@ -138,44 +172,53 @@ class appbarWidget extends StatelessWidget implements PreferredSizeWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Container(
-                  height: rp.hp(10),
+                  height: rp.hp(7),
                   width: rp.wp(28),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0)),
                   child: const Column(
                     children: <Widget>[
-                      Text('Prestamos',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17)),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Prestamos',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17)),
+                      ),
                     ],
                   ),
                 ),
                 Container(
-                  height: rp.hp(10),
+                  height: rp.hp(7),
                   width: rp.wp(28),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0)),
                   child: const Column(
                     children: <Widget>[
-                      Text('Inventario',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17)),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Inventario',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17)),
+                      ),
                     ],
                   ),
                 ),
                 Container(
-                  height: rp.hp(10),
+                  height: rp.hp(7),
                   width: rp.wp(28),
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0)),
                   child: const Column(
                     children: <Widget>[
-                      Text('Clientes',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 17)),
+                      Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Clientes',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17)),
+                      ),
                     ],
                   ),
                 )

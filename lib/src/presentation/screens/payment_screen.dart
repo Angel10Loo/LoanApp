@@ -11,7 +11,7 @@ import 'package:loan_app/src/utils/helper.dart';
 import 'package:loan_app/src/utils/responsive.dart';
 
 class PaymentScreen extends StatefulWidget {
-  PaymentScreen({Key? key}) : super(key: key);
+  const PaymentScreen({Key? key}) : super(key: key);
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();

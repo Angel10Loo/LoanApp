@@ -12,25 +12,25 @@ class ChartWidget extends StatefulWidget {
 
 class _ChartWidgetState extends State<ChartWidget> {
   List<_SalesData> data = [
-    _SalesData('Ene', 35),
-    _SalesData('Feb', 28),
-    _SalesData('Mar', 34),
+    _SalesData('En', 20),
+    _SalesData('Fe', 28),
+    _SalesData('Ma', 34),
     _SalesData('Ab', 32),
     _SalesData('Ma', 40),
-    _SalesData('Jun', 40),
-    _SalesData('Jul', 40),
-    _SalesData('Ago', 80),
-    _SalesData('Sep', 10),
-    _SalesData('Oct', 100),
-    _SalesData('Nov', 60),
-    _SalesData('Dic', 40)
+    _SalesData('Ju', 40),
+    _SalesData('Ju', 40),
+    _SalesData('Ag', 80),
+    _SalesData('Se', 10),
+    _SalesData('Oc', 100),
+    _SalesData('No', 60),
+    _SalesData('Di', 40)
   ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: bodyColor,
         body: Center(
-          child: Container(
+          child: SizedBox(
             height: 300,
             width: double.infinity,
             child: SfCartesianChart(
