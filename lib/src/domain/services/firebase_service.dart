@@ -184,6 +184,9 @@ class FirebaseService {
       case TermType.Semanal:
         model.termTypevalue = 'Semana';
         break;
+      case TermType.Daily:
+        model.termTypevalue = 'Diario';
+        break;
       default:
         return 'Unknown';
     }

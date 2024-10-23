@@ -10,17 +10,18 @@ class Loan {
   String createdDate;
   TermType? termType;
   String? termTypevalue;
+  int? dailyQuote;
 
-  Loan({
-    this.loanId,
-    this.termType,
-    this.termTypevalue,
-    required this.customerName,
-    required this.createdDate,
-    required this.period,
-    required this.interest,
-    required this.amount,
-  });
+  Loan(
+      {this.loanId,
+      this.termType,
+      this.termTypevalue,
+      required this.customerName,
+      required this.createdDate,
+      required this.period,
+      required this.interest,
+      required this.amount,
+      this.dailyQuote});
 
   static fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
@@ -32,6 +33,7 @@ class Loan {
       interest: data['interest'],
       amount: data['amount'],
       createdDate: data['createdDate'],
+      dailyQuote: data['dailyQoute'] ?? 0,
     );
   }
 }

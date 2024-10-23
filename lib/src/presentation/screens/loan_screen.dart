@@ -25,7 +25,7 @@ class LoanScreen extends StatefulWidget {
 List<Loan> loansFound = [];
 
 class _LoanScreenState extends State<LoanScreen> {
-  TermType? selectedOption;
+  TermType selectedOption = TermType.Semanal;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _searchController = TextEditingController();
   final FirebaseService _firebaseService = FirebaseService();
@@ -233,114 +233,133 @@ class _LoanScreenState extends State<LoanScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Crear Préstamo'),
-            content: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    DropdownSearch<Customer>(
-                      dropdownDecoratorProps: const DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
-                              labelText: "Seleccionar cliente",
-                              hintText: "Clientes")),
-                      items: customers,
-                      selectedItem: selectedCustomer,
-                      itemAsString: (Customer? customer) =>
-                          "${customer!.firstName}  ${customer.lastName} \n Celular : ${customer.phoneNumber}",
-                      compareFn: (item, selectedItem) =>
-                          item.customerId == selectedItem.customerId,
-                      popupProps:
-                          const PopupPropsMultiSelection.modalBottomSheet(
-                        isFilterOnline: true,
-                        showSelectedItems: true,
-                        showSearchBox: true,
+            content: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DropdownSearch<Customer>(
+                        dropdownDecoratorProps: const DropDownDecoratorProps(
+                            dropdownSearchDecoration: InputDecoration(
+                                labelText: "Seleccionar cliente",
+                                hintText: "Clientes")),
+                        items: customers,
+                        selectedItem: selectedCustomer,
+                        itemAsString: (Customer? customer) =>
+                            "${customer!.firstName}  ${customer.lastName} \n Celular : ${customer.phoneNumber}",
+                        compareFn: (item, selectedItem) =>
+                            item.customerId == selectedItem.customerId,
+                        popupProps:
+                            const PopupPropsMultiSelection.modalBottomSheet(
+                          isFilterOnline: true,
+                          showSelectedItems: true,
+                          showSearchBox: true,
+                        ),
+                        onChanged: (Customer? customer) {
+                          setState(() {
+                            selectedCustomer = customer;
+                          });
+                        },
+                        onSaved: (newValue) {
+                          _loan.customerName =
+                              "${newValue!.firstName} ${newValue.lastName}";
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Por favor seleccione un cliente';
+                          }
+                          return null;
+                        },
                       ),
-                      onChanged: (Customer? customer) {
-                        setState(() {
-                          selectedCustomer = customer;
-                        });
-                      },
-                      onSaved: (newValue) {
-                        _loan.customerName =
-                            "${newValue!.firstName} ${newValue.lastName}";
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Por favor seleccione un cliente';
-                        }
-                        return null;
-                      },
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                          labelText: 'Monto del préstamo'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese el monto';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _loan.amount = double.parse(value!);
-                      },
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration:
-                          const InputDecoration(labelText: 'Taza de interés'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese la taza de interés';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _loan.interest = double.parse(value!);
-                      },
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Plazo'),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese el plazo';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _loan.period = int.parse(value!);
-                      },
-                    ),
-                    DropdownButtonFormField(
-                      decoration: const InputDecoration(labelText: 'Pagos'),
-                      value: selectedOption,
-                      isExpanded: true,
-                      icon: const Icon(Icons.arrow_circle_down_rounded,
-                          color: mainColor),
-                      items: const [
-                        DropdownMenuItem(
-                            child: Text("Semanas"), value: TermType.Semanal),
-                        DropdownMenuItem(
-                            child: Text("Quincenas"),
-                            value: TermType.Quincenal),
-                        DropdownMenuItem(
-                            child: Text("Menses"), value: TermType.Mensual)
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          selectedOption = value as TermType;
-                        });
-                      },
-                      onSaved: (newValue) {
-                        _loan.termType = newValue as TermType;
-                      },
-                    ),
-                  ],
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                            labelText: 'Monto del préstamo'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor ingrese el monto';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _loan.amount = double.parse(value!);
+                        },
+                      ),
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration:
+                            const InputDecoration(labelText: 'Taza de interés'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor ingrese la taza de interés';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _loan.interest = double.parse(value!);
+                        },
+                      ),
+                      TextFormField(
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(labelText: 'Plazo'),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor ingrese el plazo';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _loan.period = int.parse(value!);
+                        },
+                      ),
+                      DropdownButtonFormField(
+                        decoration: const InputDecoration(labelText: 'Pagos'),
+                        value: selectedOption,
+                        isExpanded: true,
+                        icon: const Icon(Icons.arrow_circle_down_rounded,
+                            color: mainColor),
+                        items: const [
+                          DropdownMenuItem(
+                              child: Text("Semanas"), value: TermType.Semanal),
+                          DropdownMenuItem(
+                              child: Text("Quincenas"),
+                              value: TermType.Quincenal),
+                          DropdownMenuItem(
+                              child: Text("Menses"), value: TermType.Mensual),
+                          DropdownMenuItem(
+                              child: Text("Diarios"), value: TermType.Daily)
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            selectedOption = value as TermType;
+                          });
+                        },
+                        onSaved: (newValue) {
+                          _loan.termType = newValue as TermType;
+                        },
+                      ),
+                      if (selectedOption == TermType.Daily)
+                        TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(labelText: 'Cuota'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor ingrese la Cuota';
+                            }
+                            return null;
+                          },
+                          onSaved: (value) {
+                            _loan.dailyQuote = int.parse(value!);
+                          },
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            }),
             actions: [
               TextButton(
                 onPressed: () {
@@ -365,7 +384,11 @@ class _LoanScreenState extends State<LoanScreen> {
                     _loan.loanId = id;
 
                     if (id.isNotEmpty) {
-                      await generateAmortization(_loan);
+                      if (selectedOption != TermType.Daily) {
+                        await generateAmortization(_loan);
+                      } else {
+                        await generateAmortizationForDailyLoan(_loan);
+                      }
                     }
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -383,6 +406,24 @@ class _LoanScreenState extends State<LoanScreen> {
             ],
           );
         });
+  }
+
+  generateAmortizationForDailyLoan(Loan loan) async {
+    int totalAmount = loan.dailyQuote! * loan.period;
+    int remainingBalance = totalAmount;
+    DateTime paymentDate = DateTime.now();
+
+    for (int index = 1; index <= loan.period; index++) {
+      int quote = (totalAmount ~/ loan.period);
+      int capital = 0;
+      remainingBalance -= quote;
+      Amortization amortization = setAmortization(
+          quote, 0, remainingBalance, loan, capital, index, paymentDate);
+
+      paymentDate = amortization.paymentDate!;
+      loansFound = [];
+      await _firebaseService.saveAmortization(amortization);
+    }
   }
 
   generateAmortization(Loan loan) async {
@@ -438,6 +479,16 @@ class _LoanScreenState extends State<LoanScreen> {
           principal: capital,
           remainingBalance: remainingBalance,
           paymentDate: paymentDate.add(const Duration(days: 7)));
+    } else if (loan.termType == TermType.Daily) {
+      return Amortization(
+          isPayment: false,
+          loanId: loan.loanId,
+          period: index,
+          quote: quote,
+          interest: interest,
+          principal: capital,
+          remainingBalance: remainingBalance,
+          paymentDate: paymentDate.add(const Duration(days: 1)));
     } else {
       return Amortization(
           isPayment: false,

@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    name: 'loan2-47cef',
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(const MyApp());

@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:loan_app/src/domain/entities/amortization.dart';
@@ -9,6 +9,11 @@ import 'package:loan_app/src/presentation/Widgets/appbar_widget.dart';
 import 'package:loan_app/src/utils/constans.dart';
 import 'package:loan_app/src/utils/helper.dart';
 import 'package:loan_app/src/utils/responsive.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
+String customerNameG = "";
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({Key? key}) : super(key: key);
@@ -27,6 +32,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final rp = Responsive(context);
     final String id = args!["id"];
     final String customerName = args["customerName"];
+    customerNameG = customerName;
     return SafeArea(
         bottom: false,
         child: Scaffold(
@@ -171,7 +177,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   bottom: 0,
                   right: 0,
                   child: handlePaymentAndPrint(
-                      amortization.amortizationId!,
+                      amortization,
                       amortization.isPayment,
                       minNumber,
                       amortization.period,
@@ -185,7 +191,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  TextButton handlePaymentAndPrint(String amortizationId, bool isPayment,
+  TextButton handlePaymentAndPrint(Amortization amortization, bool isPayment,
       int minNumber, int currentNumber, double income) {
     final FirebaseService _firebaseService = FirebaseService();
     return isPayment
@@ -197,7 +203,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(13))),
             onPressed: () {
-              // Handle button press
+              _generateAndSharePDF(context, amortization);
             },
             child: const Row(
               children: [Icon(Icons.print)],
@@ -220,7 +226,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     if (accept!) {
                       await _firebaseService
                           .updateAmortizationIsPayment(
-                              amortizationId, isPayment = true)
+                              amortization.amortizationId!, isPayment = true)
                           .then((value) => {
                                 ScaffoldMessenger.of(context)
                                     .showSnackBar(_showSnackBar(context)),
@@ -239,6 +245,46 @@ class _PaymentScreenState extends State<PaymentScreen> {
               children: [Icon(Icons.money_off_rounded), Text("Pagar")],
             ),
           );
+  }
+
+  Future<void> _generateAndSharePDF(
+      BuildContext context, Amortization amortization) async {
+    // Create a PDF document
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('Cliente : $customerNameG',
+                style: const pw.TextStyle(fontSize: 16)),
+            pw.Text('Entidad: ' 'Leo Rodriguez Prestamos',
+                style: const pw.TextStyle(fontSize: 16)),
+            pw.SizedBox(height: 20),
+            pw.Text('Cuota: \$${amortization.period}',
+                style: const pw.TextStyle(fontSize: 16)),
+            pw.Text('Capital: \$${amortization.principal.toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 16)),
+            pw.Text('Interés: \$${amortization.interest.toStringAsFixed(2)}',
+                style: const pw.TextStyle(fontSize: 16)),
+            pw.Text('Fecha: ${DateFormat('yyyy-MM-dd').format(DateTime.now())}',
+                style: const pw.TextStyle(fontSize: 16)),
+          ],
+        ),
+      ),
+    );
+
+    final tempDir = await getTemporaryDirectory();
+    final tempFilePath = '${tempDir.path}/voucher.pdf';
+    final File tempFile = File(tempFilePath);
+    await tempFile.writeAsBytes(await pdf.save());
+
+    final xFile = XFile(tempFilePath);
+    Share.shareXFiles([xFile],
+        text:
+            "Comprobante de su pago, Si tiene alguna duda comuníquese con nosotros",
+        sharePositionOrigin: Rect.zero);
+    // Share the PDF file
   }
 
   int findSmallestNumber(List<Amortization> data) {

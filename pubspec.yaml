@@ -35,6 +35,8 @@ dependencies:
   dropdown_search: ^5.0.6
   card_actions: ^0.0.1
   syncfusion_flutter_charts: ^23.1.38
+  share_plus: ^7.2.2
+  pdf: ^3.10.8
 
 
 dev_dependencies:

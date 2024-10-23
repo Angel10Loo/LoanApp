@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:loan_app/src/domain/entities/customer.dart';
 import 'package:loan_app/src/domain/entities/income.dart';
+import 'package:loan_app/src/domain/entities/loan.dart';
 import 'package:loan_app/src/domain/services/firebase_service.dart';
 import 'package:loan_app/src/presentation/Widgets/app_bar.dart';
 import 'package:loan_app/src/presentation/Widgets/bottom_tab.dart';
@@ -17,16 +19,41 @@ class MainScreen extends StatefulWidget {
 }
 
 int loanIncome = 0;
+double invesmentCapital = 0;
+int customerCount = 0;
 
 class _MainScreenState extends State<MainScreen> {
   final FirebaseService _firebaseService = FirebaseService();
 
   Income _income =
       Income(createdDate: Timestamp.fromDate(DateTime.now()), income: 0);
+  List<Loan> _loans = [];
   @override
   void initState() {
     super.initState();
+    invesmentCapital = 0;
     fetchIncome();
+    fetchLoanInvestmentCapital();
+    fetchCustomers();
+  }
+
+  Future<void> fetchCustomers() async {
+    List<Customer>? customers = await _firebaseService.getCustomers();
+    customerCount = customers.length;
+  }
+
+  Future<void> fetchLoanInvestmentCapital() async {
+    QuerySnapshot<Map<String, dynamic>>? document =
+        await _firebaseService.getLoans();
+
+    _loans = document!.docs
+        .map((doc) => Loan.fromSnapshot(doc))
+        .toList()
+        .cast<Loan>();
+
+    for (Loan element in _loans) {
+      invesmentCapital += element.amount;
+    }
   }
 
   Future<void> fetchIncome() async {
@@ -177,14 +204,16 @@ class appbarWidget extends StatelessWidget implements PreferredSizeWidget {
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0)),
-                  child: const Column(
+                  child: Column(
                     children: <Widget>[
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text('Prestamos',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 17)),
                       ),
+                      Text(Helper.formatNumberWithCommas(
+                          invesmentCapital.toString()))
                     ],
                   ),
                 ),
@@ -211,14 +240,15 @@ class appbarWidget extends StatelessWidget implements PreferredSizeWidget {
                   decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10.0)),
-                  child: const Column(
+                  child: Column(
                     children: <Widget>[
-                      Padding(
+                      const Padding(
                         padding: EdgeInsets.all(8.0),
                         child: Text('Clientes',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 17)),
                       ),
+                      Text(customerCount.toString())
                     ],
                   ),
                 )
